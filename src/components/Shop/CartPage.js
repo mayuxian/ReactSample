@@ -1,20 +1,23 @@
 import React from 'react';
 import GoodStore from './GoodStore';
-import { Good } from './Good';
-// import { Cart } from './Cart';
-// import { Shop } from './Shop';
+import { Cart } from './Cart';
+import { Shop } from './Shop';
 
 export default class CartPage extends React.Component {
   constructor() {
     super();
     this.goods = GoodStore.getGoods();
+    this.regionTypes = {
+      shop: 0,
+      cart: 1
+    };
+    this.handleRegion = null;
     this.state = {
       shop: [...this.goods],
       cart: []
     }
   }
   addGoodToShop = good => {
-    console.log(`Shop.add:${JSON.stringify(good)}`);
     const newGoods = [...this.state.shop];
     const index = newGoods.findIndex(g => g.id === good.id);
     const preGood = newGoods[index];
@@ -22,13 +25,14 @@ export default class CartPage extends React.Component {
     newGoods.splice(index, 1, newGood);
 
     this.setState({ shop: newGoods });
-    this.addGoodToCart(good);
+    if (this.handleRegion === this.regionTypes.shop) {
+      this.addGoodToCart(good);
+    }
   };
   minusGoodFromShop = good => {
     if (good.count === 0) {
       return;
     }
-    console.log(`Shop.minus:${good}`);
     const newGoods = [...this.state.shop];
     const index = newGoods.findIndex(g => g.id === good.id);
     const preGood = newGoods[index];
@@ -36,11 +40,12 @@ export default class CartPage extends React.Component {
     newGoods.splice(index, 1, newGood);
 
     this.setState({ shop: newGoods });
-    this.minusGoodFromCart(good);
+    if (this.handleRegion === this.regionTypes.shop) {
+      this.minusGoodFromCart(good);
+    }
   };
 
   addGoodToCart = good => {
-    console.log(`Shop.add:${JSON.stringify(good)}`);
     const newGoods = [...this.state.cart];
     const index = newGoods.findIndex(g => g.id === good.id);
     const preGood = newGoods[index];
@@ -54,9 +59,11 @@ export default class CartPage extends React.Component {
     }
 
     this.setState({ cart: newGoods });
+    if (this.handleRegion === this.regionTypes.cart) {
+      this.addGoodToShop(good);
+    }
   };
   minusGoodFromCart = good => {
-    console.log(`Shop.minus:${good}`);
     const newGoods = [...this.state.cart];
     const index = newGoods.findIndex(g => g.id === good.id);
     const preGood = newGoods[index];
@@ -68,56 +75,30 @@ export default class CartPage extends React.Component {
     }
 
     this.setState({ cart: newGoods });
+    if (this.handleRegion === this.regionTypes.cart) {
+      this.minusGoodFromShop(good);
+    }
   };
   render() {
     return (
       <div>
-        {/* <Shop goods={this.state.shop} addGood={good => this.addGoodToShop(good)} minusGood={good => this.minusGoodFromShop(good)}></Shop>
-        <Cart goods={this.state.cart} addGood={this.addGoodToCart} minusGood={this.minusGoodFromCart}></Cart> */}
-        {/* 列表渲染 */}
-        <ul>
-          {
-            this.state.shop.map(good => (
-              <tr key={good.id}>
-                <td>
-                  <Good id={good.id} name={good.name} price={good.price} description={good.description}></Good>
-                </td>
-                <td>
-                  <button onClick={() => this.minusGoodFromShop(good)}>-</button>
-                  &nbsp; {good.count || "0"} &nbsp;
-                    <button onClick={() => this.addGoodToShop(good)}> +</button>
-                </td>
-              </tr>
-            ))
-          }
-        </ul>
-
-        {/* 购物车 */}
-        <Cart goods={this.state.cart} minus={this.minusGoodFromCart} add={this.addGoodToCart} />
+        <Shop title="水果超市" goods={this.state.shop} addGood={good => {
+          this.handleRegion = this.regionTypes.shop;
+          this.addGoodToShop(good);
+        }} minusGood={good => {
+          this.handleRegion = this.regionTypes.shop;
+          this.minusGoodFromShop(good);
+        }}></Shop>
+        <br/>
+        <br />
+        <Cart title="购物车" goods={this.state.cart} addGood={good => {
+          this.handleRegion = this.regionTypes.cart;
+          this.addGoodToCart(good)
+        }} minusGood={good => {
+          this.handleRegion = this.regionTypes.cart;
+          this.minusGoodFromCart(good)
+        }}></Cart>
       </div>
     );
   }
-}
-
-function Cart({ goods, minus, add }) {
-  return (
-    <table>
-      <tbody>
-        {
-          goods.map(good => (
-            <tr key={good.id}>
-              <td>
-                <Good id={good.id} name={good.name} price={good.price * good.count}></Good>
-              </td>
-              <td>
-                <button onClick={minus}>-</button>
-                &nbsp; {good.count || "0"} &nbsp;
-                    <button onClick={add}> +</button>
-              </td>
-            </tr>
-          ))
-        }
-      </tbody>
-    </table>
-  );
 }

@@ -1,9 +1,6 @@
 import React from 'react';
 
 class Good extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
       <div style={{ border: "1px solid gray" }}>

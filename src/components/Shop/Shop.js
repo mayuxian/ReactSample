@@ -3,25 +3,21 @@ import { Good } from './Good';
 import PropTypes from 'prop-types'
 
 class Shop extends React.Component {
-
   static propTypes = {
     addGood: PropTypes.func.isRequired,
     minusGood: PropTypes.func.isRequired
   }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      goods: props.goods
-    }
-  }
   render() {
     return (
       <>
+        <div style={{ fontSize: "20px" }}>
+          {this.props.title}
+        </div>
         <table>
           <tbody>
             {
-              this.state.goods.map(good => (
+
+              this.props.goods.map(good => (
                 <tr key={good.id}>
                   <td>
                     <Good id={good.id} name={good.name} price={good.price} description={good.description}></Good>
@@ -33,6 +29,7 @@ class Shop extends React.Component {
                   </td>
                 </tr>
               ))
+
             }
           </tbody>
         </table>
